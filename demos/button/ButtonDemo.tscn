@@ -1,0 +1,61 @@
+[gd_scene format=4]
+
+[ext_resource type="Script" path="res://demos/button/button_demo.gd" id="1"]
+[ext_resource type="PackedScene" path="res://blocks/button/Button.tscn" id="2"]
+[ext_resource type="PackedScene" path="res://blocks/button/ScaleButton.tscn" id="3"]
+[ext_resource type="PackedScene" path="res://blocks/button/ToggleButton.tscn" id="4"]
+
+[node name="ButtonDemo" type="Control"]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1")
+
+[node name="Root" type="VBoxContainer" parent="."]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 24.0
+offset_top = 24.0
+offset_right = -24.0
+offset_bottom = -24.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/separation = 12
+
+[node name="Title" type="Label" parent="Root"]
+text = "Button 积木 — Pure: Button / ToggleButton · Behavior: ScaleButton"
+
+[node name="Row1" type="HBoxContainer" parent="Root"]
+theme_override_constants/separation = 16
+
+[node name="PlainBtn" parent="Root/Row1" instance=ExtResource("2")]
+text = "普通 Button"
+
+[node name="ScaleBtn" parent="Root/Row1" instance=ExtResource("3")]
+text = "Hover Me"
+
+[node name="DisabledBtn" parent="Root/Row1" instance=ExtResource("3")]
+disabled = true
+text = "Disabled"
+
+[node name="Row2" type="HBoxContainer" parent="Root"]
+theme_override_constants/separation = 16
+
+[node name="ToggleA" parent="Root/Row2" instance=ExtResource("4")]
+text = "选项 A"
+
+[node name="ToggleB" parent="Root/Row2" instance=ExtResource("4")]
+text = "选项 B"
+
+[node name="ToggleC" parent="Root/Row2" instance=ExtResource("4")]
+text = "选项 C"
+
+[node name="ToggleLog" type="Label" parent="Root"]
+text = "toggle: —"
+
+[node name="Hint" type="Label" parent="Root"]
+text = "视觉全部来自 DemoTheme；hover_scale / duration 等参数在 Inspector 里调。"
+theme_override_colors/font_color = Color(0.6, 0.6, 0.68, 1)

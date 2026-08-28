@@ -1,0 +1,59 @@
+[gd_scene format=4]
+
+[ext_resource type="Script" path="res://demos/drawer/drawer_demo.gd" id="1"]
+[ext_resource type="PackedScene" path="res://blocks/drawer/DrawerPanel.tscn" id="2"]
+[ext_resource type="PackedScene" path="res://blocks/button/ScaleButton.tscn" id="3"]
+
+[node name="DrawerDemo" type="Control"]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1")
+
+[node name="Root" type="VBoxContainer" parent="."]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 24.0
+offset_top = 24.0
+offset_right = -24.0
+offset_bottom = -24.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/separation = 12
+
+[node name="Title" type="Label" parent="Root"]
+text = "Drawer 积木（Behavior）— 锚点贴边 + offset Tween"
+
+[node name="Row" type="HBoxContainer" parent="Root"]
+theme_override_constants/separation = 16
+
+[node name="OpenRightBtn" parent="Root/Row" instance=ExtResource("3")]
+text = "右侧滑出"
+
+[node name="OpenLeftBtn" parent="Root/Row" instance=ExtResource("3")]
+text = "左侧滑出"
+
+[node name="OpenBottomBtn" parent="Root/Row" instance=ExtResource("3")]
+text = "底部滑出"
+
+[node name="Log" type="Label" parent="Root"]
+text = "drawer: —"
+
+[node name="Hint" type="Label" parent="Root"]
+text = "direction / duration / transition 在 Inspector 调；视觉走 Theme（DrawerPanel 类型）。"
+theme_override_colors/font_color = Color(0.6, 0.6, 0.68, 1)
+
+[node name="RightDrawer" parent="." instance=ExtResource("2")]
+visible = false
+
+[node name="LeftDrawer" parent="." instance=ExtResource("2")]
+visible = false
+direction = 0
+
+[node name="BottomDrawer" parent="." instance=ExtResource("2")]
+visible = false
+direction = 3
+custom_minimum_size = Vector2(0, 240)

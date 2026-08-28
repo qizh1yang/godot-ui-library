@@ -1,0 +1,7 @@
+[gd_scene format=4]
+
+[ext_resource type="Script" path="res://blocks/card/card.gd" id="1"]
+
+[node name="Card" type="PanelContainer"]
+custom_minimum_size = Vector2(140, 180)
+script = ExtResource("1")

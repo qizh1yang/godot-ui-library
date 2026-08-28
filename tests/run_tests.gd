@@ -1,19 +1,20 @@
 extends SceneTree
-## headless 自动化测试：实例化组件 → 模拟状态/信号 → 断言。
+## headless 自动化测试：实例化 blocks → 模拟行为 → 断言。
 ## 运行：godot --headless --path . --script res://tests/run_tests.gd
 ##
-## 注意：--script 模式 autoload 不可用，测试不依赖 UISignalBus——同时验证组件零依赖原则。
+## 原则：组件零依赖（无 autoload / 无项目资源依赖），测试直接实例化场景验证行为。
 
 var _passed: int = 0
 var _failed: int = 0
 
 const SCENES: Dictionary = {
-	"ui_button": "res://src/components/button/ui_button/UIButton.tscn",
-	"scale_button": "res://src/components/button/scale_button/ScaleButton.tscn",
-	"toggle_button": "res://src/components/button/toggle_button/ToggleButton.tscn",
-	"base_panel": "res://src/components/panel/base_panel/BasePanel.tscn",
-	"ui_popup": "res://src/components/panel/ui_popup/UIPopup.tscn",
-	"base_card": "res://src/components/card/base_card/BaseCard.tscn",
+	"button": "res://blocks/button/Button.tscn",
+	"scale_button": "res://blocks/button/ScaleButton.tscn",
+	"toggle_button": "res://blocks/button/ToggleButton.tscn",
+	"panel": "res://blocks/panel/Panel.tscn",
+	"popup_panel": "res://blocks/popup/PopupPanel.tscn",
+	"card": "res://blocks/card/Card.tscn",
+	"drawer_panel": "res://blocks/drawer/DrawerPanel.tscn",
 }
 
 func _initialize() -> void:
@@ -21,11 +22,11 @@ func _initialize() -> void:
 
 func _run_all() -> void:
 	await _test_scenes_loadable()
-	await _test_ui_state()
 	await _test_scale_button()
 	await _test_toggle_button()
-	await _test_ui_popup()
-	await _test_base_card()
+	await _test_popup_panel()
+	await _test_card()
+	await _test_drawer()
 	print("========================================")
 	print("RESULT: %d passed, %d failed" % [_passed, _failed])
 	quit(0 if _failed == 0 else 1)
@@ -55,62 +56,52 @@ func _test_scenes_loadable() -> void:
 		check(node != null, "instantiate %s" % id)
 		node.queue_free()
 
-func _test_ui_state() -> void:
-	print("-- UIState --")
-	var st := UIState.new()
-	check(st.current == UIState.State.NORMAL, "initial state NORMAL")
-	check(st.transition(UIState.State.HOVER), "NORMAL -> HOVER")
-	check(not st.transition(UIState.State.HOVER), "same-state transition blocked (no re-emit)")
-	var seen: Array[int] = []
-	st.changed.connect(func(from: int, to: int) -> void: seen.append(to))
-	st.transition(UIState.State.PRESSED)
-	check(seen == [UIState.State.PRESSED], "changed signal emitted once")
-	check(UIState.name_of(UIState.State.SELECTED) == "SELECTED", "name_of SELECTED")
-
 func _test_scale_button() -> void:
 	print("-- ScaleButton --")
 	var btn: ScaleButton = instantiate(SCENES["scale_button"]) as ScaleButton
-	check(btn.state.current == UIState.State.NORMAL, "ScaleButton initial NORMAL")
-	btn._set_state(UIState.State.HOVER)
-	check(btn.state.current == UIState.State.HOVER, "set_state HOVER")
-	btn._set_state(UIState.State.PRESSED)
-	check(btn.state.current == UIState.State.PRESSED, "set_state PRESSED")
-	var state_seen: Array[int] = []
-	btn.state_changed.connect(func(from: int, to: int) -> void: state_seen.append(to))
+	check(btn.scale.is_equal_approx(Vector2.ONE), "initial scale 1.0")
+	btn.duration = 0.05 # 缩短动画便于测试等待
+	btn._on_mouse_entered()
+	if btn._tween != null and btn._tween.is_valid():
+		await btn._tween.finished # 等 tween 完成（headless 下 create_timer 计时不可靠，用信号）
+	check(btn.scale.is_equal_approx(btn.hover_scale), "hover -> hover_scale")
+	btn._on_button_down()
+	if btn._tween != null and btn._tween.is_valid():
+		await btn._tween.finished
+	check(btn.scale.is_equal_approx(btn.press_scale), "press -> press_scale")
+	btn._on_button_up()
+	if btn._tween != null and btn._tween.is_valid():
+		await btn._tween.finished
+	check(btn.scale.is_equal_approx(Vector2.ONE), "release -> back to 1.0")
+	# disabled 轮询复位
 	btn.set_disabled(true)
-	await process_frame # 禁用状态经 _process 轮询同步（deferred 当帧 _process 尚未开始，需跨 2 帧）
-	await process_frame
-	check(btn.state.current == UIState.State.DISABLED, "set_disabled -> DISABLED")
-	check(btn.disabled, "button disabled property")
-	btn.set_disabled(false)
 	await process_frame
 	await process_frame
-	check(btn.state.current == UIState.State.NORMAL, "re-enable -> NORMAL")
-	btn._set_state(UIState.State.HOVER)
+	check(btn.scale.is_equal_approx(Vector2.ONE), "disabled keeps scale 1.0")
 	btn.queue_free()
 
 func _test_toggle_button() -> void:
 	print("-- ToggleButton --")
-	var btn: ToggleButton = instantiate(SCENES["toggle_button"]) as ToggleButton
+	var btn: Button = instantiate(SCENES["toggle_button"]) as Button
 	check(btn.toggle_mode, "toggle_mode on")
-	var toggled_seen: Array[bool] = []
-	btn.toggled.connect(func(on: bool) -> void: toggled_seen.append(on))
+	var toggled_events: Array[bool] = []
+	btn.toggled.connect(func(on: bool) -> void: toggled_events.append(on))
 	btn.set_pressed(true)
 	check(btn.button_pressed, "set_pressed true")
-	check(btn.state.current == UIState.State.SELECTED, "toggled -> SELECTED state")
-	check(toggled_seen == [true], "toggled signal [true]")
+	check(toggled_events == [true], "toggled signal [true]")
 	btn.set_pressed(false)
-	check(btn.state.current == UIState.State.NORMAL, "untoggled -> NORMAL state")
+	check(btn.button_pressed == false, "set_pressed false")
+	check(toggled_events == [true, false], "toggled signal [true, false]")
 	btn.queue_free()
 
-func _test_ui_popup() -> void:
-	print("-- UIPopup --")
-	var popup: UIPopup = instantiate(SCENES["ui_popup"]) as UIPopup
+func _test_popup_panel() -> void:
+	print("-- PopupPanel --")
+	var popup: UIPopup = instantiate(SCENES["popup_panel"]) as UIPopup
 	check(not popup.is_open, "initial closed")
 	check(not popup.visible, "initial hidden")
 	var opened_events: Array[int] = []
 	var closed_events: Array[int] = []
-	# 注意：lambda 对 int 局部变量是值捕获，计数必须用 Array（引用类型）
+	# lambda 对 int 局部变量是值捕获，计数必须用 Array（引用类型）
 	popup.opened.connect(func() -> void: opened_events.append(1))
 	popup.closed.connect(func() -> void: closed_events.append(1))
 	popup.open()
@@ -118,29 +109,55 @@ func _test_ui_popup() -> void:
 	check(popup.visible, "open -> visible")
 	check(opened_events.size() == 1, "opened signal once")
 	popup.open()
-	check(opened_events.size() == 1, "re-open blocked (no double emit)")
+	check(opened_events.size() == 1, "re-open blocked")
 	popup.close()
 	check(not popup.is_open, "close -> not is_open")
 	check(closed_events.size() == 1, "closed signal once")
-	# 动画模式参数存在
 	popup.animation_mode = UIPopup.AnimationMode.SCALE
 	check(popup.animation_mode == UIPopup.AnimationMode.SCALE, "animation_mode SCALE settable")
 	popup.queue_free()
 
-func _test_base_card() -> void:
-	print("-- BaseCard --")
-	var card: BaseCard = instantiate(SCENES["base_card"]) as BaseCard
-	check(card.state.current == UIState.State.NORMAL, "initial NORMAL")
-	var clicked_events: Array[int] = []
-	var selected_seen: Array[bool] = []
-	card.clicked.connect(func(c: BaseCard) -> void: clicked_events.append(1))
-	card.selected_changed.connect(func(c: BaseCard, s: bool) -> void: selected_seen.append(s))
+func _test_card() -> void:
+	print("-- Card --")
+	var card: Card = instantiate(SCENES["card"]) as Card
+	check(card.theme_type_variation == &"Card", "initial variation Card")
+	var selected_events: Array[bool] = []
+	card.selected_changed.connect(func(c: Card, s: bool) -> void: selected_events.append(s))
 	card.set_selected(true)
 	check(card.is_selected, "set_selected true")
-	check(card.state.current == UIState.State.SELECTED, "selected -> SELECTED state")
-	check(selected_seen == [true], "selected_changed [true]")
+	check(card.theme_type_variation == &"CardSelected", "variation -> CardSelected")
+	check(selected_events == [true], "selected_changed [true]")
 	card.set_selected(false)
-	check(selected_seen == [true, false], "selected_changed [true, false]")
-	card.set_disabled(true)
-	check(card.state.current == UIState.State.DISABLED, "disabled -> DISABLED")
+	check(card.theme_type_variation == &"Card", "variation -> Card")
+	# disabled 变体
+	var disabled_card: Card = instantiate(SCENES["card"]) as Card
+	disabled_card.set_disabled(true)
+	check(disabled_card.theme_type_variation == &"CardDisabled", "disabled variation CardDisabled")
+	disabled_card.queue_free()
 	card.queue_free()
+
+func _test_drawer() -> void:
+	print("-- DrawerPanel --")
+	var drawer: DrawerPanel = instantiate(SCENES["drawer_panel"]) as DrawerPanel
+	check(not drawer.is_open, "initial closed")
+	check(not drawer.visible, "initial hidden")
+	var opened_events: Array[int] = []
+	var closed_events: Array[int] = []
+	drawer.opened.connect(func() -> void: opened_events.append(1))
+	drawer.closed.connect(func() -> void: closed_events.append(1))
+	drawer.duration = 0.05 # 缩短动画便于测试等待
+	drawer.open()
+	check(drawer.is_open, "open -> is_open")
+	check(drawer.visible, "open -> visible")
+	await drawer.opened # 等滑动动画完成（opened 在动画回调里发出）
+	check(opened_events.size() == 1, "opened signal after animation")
+	check(drawer.offset_left == drawer._rest_offset.x, "offset reached rest position")
+	drawer.close()
+	check(not drawer.is_open, "close -> not is_open")
+	await drawer.closed # 等退场动画完成
+	check(closed_events.size() == 1, "closed signal after animation")
+	check(not drawer.visible, "hidden after close animation")
+	drawer.queue_free()
+
+func _test_card_disabled_helper() -> void:
+	pass

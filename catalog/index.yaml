@@ -1,119 +1,140 @@
 # Catalog — Godot Game UI Library 索引
-# AI 检索入口：按 名称/分类/交互/效果/tags 搜索后，读组件 README + Scene。
-# 新增组件必须在此登记（见 .ai/contribution_rules.md）。
+# AI 检索入口：按 名称/分类/类型/交互/效果/tags 搜索后，打开 Scene → 看 Inspector 参数 → 拖入组合。
+# 新增 Block 必须在此登记（见 .ai/contribution_rules.md）。
 
-version: 0.1
+version: 0.2
 engine: godot 4.7
 lang: gdscript
 
-components:
+# block_type: pure = 无脚本（Godot 原生节点 + Theme）；behavior = 原生节点 + 最小脚本（Theme 做不了的行为）
+blocks:
 
-  - id: ui_button
-    name: Base Button
+  - id: button
+    name: Button
+    block_type: pure
     category: button
-    scene: res://src/components/button/ui_button/UIButton.tscn
-    demo: res://demo/button/ButtonDemo.tscn
-    interactions: [hover, press, release]
+    scene: res://blocks/button/Button.tscn
+    demo: res://demos/button/ButtonDemo.tscn
+    script: none
+    interactions: [hover, press]
     effects: []
-    parameters:
-      text: ""
-      disabled: false
-    tags: [button, base, interaction, game-ui]
+    tags: [button, pure, game-ui]
 
   - id: scale_button
     name: Scale Button
+    block_type: behavior
     category: button
-    scene: res://src/components/button/scale_button/ScaleButton.tscn
-    demo: res://demo/button/ButtonDemo.tscn
+    scene: res://blocks/button/ScaleButton.tscn
+    demo: res://demos/button/ButtonDemo.tscn
+    script: res://blocks/button/scale_button.gd
     interactions: [hover, press, release]
-    effects: [scale, bounce]
+    effects: [scale]
     parameters:
       hover_scale: "Vector2(1.05, 1.05)"
       press_scale: "Vector2(0.92, 0.92)"
-      animation_duration: 0.12
+      duration: 0.12
       transition: TRANS_BACK
       ease: EASE_OUT
-    tags: [button, feedback, scale, bounce, game-ui]
+    tags: [button, behavior, scale, feedback, game-ui]
 
   - id: toggle_button
     name: Toggle Button
+    block_type: pure
     category: button
-    scene: res://src/components/button/toggle_button/ToggleButton.tscn
-    demo: res://demo/button/ButtonDemo.tscn
+    scene: res://blocks/button/ToggleButton.tscn
+    demo: res://demos/button/ButtonDemo.tscn
+    script: none
     interactions: [select, deselect]
-    effects: [scale]
-    parameters:
-      selected_scale: "Vector2(1.08, 1.08)"
-      animation_duration: 0.12
-      allow_unselect: true
-    tags: [button, toggle, select, game-ui]
-
-  - id: base_panel
-    name: Base Panel
-    category: panel
-    scene: res://src/components/panel/base_panel/BasePanel.tscn
-    demo: res://demo/panel/PanelDemo.tscn
-    interactions: [open, close]
     effects: []
-    parameters:
-      modal: false
-      close_on_click_outside: true
-    tags: [panel, container, open-close, game-ui]
+    notes: 原生 toggle_mode；选中视觉 = Theme 的 pressed StyleBox
+    tags: [button, toggle, pure, game-ui]
 
-  - id: ui_popup
-    name: Popup Panel
+  - id: panel
+    name: Panel
+    block_type: pure
     category: panel
-    scene: res://src/components/panel/ui_popup/UIPopup.tscn
-    demo: res://demo/panel/PanelDemo.tscn
+    scene: res://blocks/panel/Panel.tscn
+    demo: res://demos/panel/PanelDemo.tscn
+    script: none
+    interactions: []
+    effects: []
+    tags: [panel, container, pure, game-ui]
+
+  - id: popup_panel
+    name: Popup Panel
+    block_type: behavior
+    category: panel
+    scene: res://blocks/popup/PopupPanel.tscn
+    demo: res://demos/panel/PanelDemo.tscn
+    script: res://blocks/popup/ui_popup.gd
     interactions: [open, close]
     effects: [fade, scale]
     parameters:
       animation_mode: "FADE | SCALE | NONE"
-      animation_duration: 0.2
+      duration: 0.2
       modal: false
-      scale_from: "Vector2(0.85, 0.85)"
-    tags: [panel, popup, modal, fade, scale, game-ui]
+      close_on_click_outside: true
+    tags: [panel, popup, modal, fade, scale, behavior, game-ui]
 
-  - id: base_card
-    name: Base Card
+  - id: card
+    name: Card
+    block_type: behavior
     category: card
-    scene: res://src/components/card/base_card/BaseCard.tscn
-    demo: res://demo/card/CardDemo.tscn
-    interactions: [hover, press, select, deselect]
+    scene: res://blocks/card/Card.tscn
+    demo: res://demos/card/CardDemo.tscn
+    script: res://blocks/card/card.gd
+    interactions: [hover, select, deselect]
     effects: [scale]
     parameters:
       selectable: true
-      hover_scale: "Vector2(1.02, 1.02)"
-      selected_scale: "Vector2(1.05, 1.05)"
-      animation_duration: 0.12
-    tags: [card, select, hover, game-ui]
+      disabled: false
+      hover_scale: "Vector2(1.0, 1.0)"
+      selected_scale: "Vector2(1.0, 1.0)"
+      duration: 0.12
+    notes: 状态视觉 = Theme 变体 Card/CardHover/CardSelected/CardDisabled
+    tags: [card, select, hover, behavior, game-ui]
+
+  - id: drawer_panel
+    name: Drawer Panel
+    block_type: behavior
+    category: panel
+    scene: res://blocks/drawer/DrawerPanel.tscn
+    demo: res://demos/drawer/DrawerDemo.tscn
+    script: res://blocks/drawer/drawer_panel.gd
+    interactions: [open, close]
+    effects: [slide]
+    parameters:
+      direction: "LEFT | RIGHT | TOP | BOTTOM"
+      duration: 0.25
+      transition: TRANS_CUBIC
+      modal: true
+      close_on_click_outside: true
+    tags: [drawer, sidebar, slide, modal, behavior, game-ui]
 
 interactions:
   - id: hover
     name: Hover
-    description: 鼠标进入/离开组件（触摸无 hover）
-    states: [NORMAL, HOVER]
+    description: 鼠标进入/离开（Theme hover StyleBox / 脚本缩放）
   - id: press
     name: Press
-    description: 按下（button_down / gui_input）
-    states: [PRESSED]
+    description: 按下（Theme pressed StyleBox / 脚本缩放）
   - id: select
     name: Select
-    description: 选中/取消（toggle / set_selected）
-    states: [SELECTED]
+    description: 选中/取消（toggle_mode 或 theme_type_variation 切换）
+  - id: open
+    name: Open
+    description: 打开（显示 + 入场动画）
+  - id: close
+    name: Close
+    description: 关闭（退场动画 + 隐藏）
 
 effects:
   - id: scale
     name: Scale
-    class: src/animation/scale/scale_feedback.gd
-    params: [target, duration, transition, ease]
+    description: 缩放反馈（Transform 变化，Theme 做不了，脚本负责）
   - id: fade
     name: Fade
-    class: src/animation/fade/fade_feedback.gd
-    params: [target_alpha, duration, hide_on_end]
-  - id: bounce
-    name: Bounce
-    class: src/animation/bounce/bounce_feedback.gd
-    params: [strength, duration]
-
-gameplay: []
+    description: 透明度渐入渐出
+  - id: slide
+    name: Slide
+    description: 位置滑入滑出（Drawer）

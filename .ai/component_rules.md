@@ -1,66 +1,62 @@
-# Component Rules — 组件规范
+# Component Rules — Block 规范
 
-## 1. 每个 Component 必须
+## 1. Block 必须
 
 1. 可以独立实例化（有自己的 `.tscn`）。
-2. 尽可能不依赖具体 Gameplay（零依赖原则）。
-3. 对外暴露清晰的 `@export` 参数。
-4. 使用 Godot Signal 进行事件通知。
-5. 不直接修改外部业务系统。
-6. 必须提供 Demo（可独立运行）。
-7. 必须有 Catalog 描述（`catalog/index.yaml` 条目）。
-8. 必须有 README（组件目录下，含参数/用法/参考来源）。
+2. 视觉全部来自 Theme（类型名 / theme_type_variation），脚本零样式值（禁止硬编码 Color/StyleBox/Font）。
+3. 对外暴露清晰的 `@export` 参数（Inspector 里配）。
+4. 用 Godot 原生 Signal 通知（clicked / selected_changed / opened / closed / toggled）。
+5. 不直接修改外部业务系统（发信号，业务方决定）。
+6. 必须提供 Demo。
+7. 必须加入 Catalog（`catalog/index.yaml`）。
+8. 有 README（参数/用法）。
 
-## 2. 参数规范
+## 2. Pure Block 铁律
 
-- 参数只描述**表现**，不描述**业务**：
+没有脚本。如果发现需要脚本，先问：**Theme 能不能做？原生节点能不能做？**
+- 能 → 不加脚本
+- 不能 → 升级为 Behavior Block（加最小脚本）
+
+## 3. Behavior Block 铁律
+
+- 脚本**只做 Theme 做不了的那一件事**：
+  - Transform 变化（scale 缩放）→ Tween
+  - 位置移动（抽屉滑入滑出）→ 锚点 + offset + Tween
+  - 开合动画 / 显隐时序 → Tween + hide/show
+  - 状态切换（hover/selected/disabled）→ `theme_type_variation` 切换 + 信号
+- 脚本里**禁止**出现颜色、字体、样式相关代码（那是 Theme 的领地）。
+- 参数只描述**行为**，不描述视觉：
 
 ```gdscript
-# 正确 —— ScaleButton
+# 正确（ScaleButton）
 @export var hover_scale: Vector2 = Vector2(1.05, 1.05)
-@export var press_scale: Vector2 = Vector2(0.92, 0.92)
-@export var animation_duration: float = 0.12
+@export var duration: float = 0.12
 @export var transition: int = Tween.TRANS_BACK
-@export var ease: int = Tween.EASE_OUT
 
-# 错误 —— 业务泄漏
-@export var player_id: int
-@export var coin_manager: Node
-@export var hero_data: Dictionary
+# 错误（视觉泄漏）
+@export var bg_color: Color
+@export var font: Font
 ```
 
-- 所有参数必须有默认值（组件零配置即可用）。
-- 参数命名：`<名词>_scale` / `<名词>_duration` / `<形容词>_<属性>`。
+## 4. 参数规范
 
-## 3. 信号规范
+- 全部 `@export`，全部有默认值（零配置可用）。
+- 命名：`<名词>_scale` / `duration` / `transition` / `ease`。
+- 需要视觉参数时，用 Theme 类型/变体名而非颜色值（如 `selected_variation: StringName = &"CardSelected"`）。
 
-- 信号名用过去时或动词过去式：`toggled` / `clicked` / `selected_changed` / `opened` / `closed` / `drag_started`。
-- 信号参数携带最小上下文（通常是自己 + 必要数据），业务系统自行关联。
-- 组件内部状态变化统一走 `state_changed(from, to)`（由 `UIState` 发出）。
+## 5. 信号规范
 
-## 4. 状态规范
+- 过去时：`clicked` / `selected_changed` / `opened` / `closed` / `toggled`。
+- 参数携带最小上下文（自己 + 必要数据）。
 
-所有组件共享同一套状态机（`UIState`）：
+## 6. 零依赖
 
-```text
-NORMAL → HOVER → PRESSED → (release) → HOVER / NORMAL
-SELECTED（选中态，独立于 hover / press）
-DISABLED（禁用态，拦截一切交互）
-```
+- 不访问 autoload、不 preload 业务脚本。
+- 不依赖项目资源（样式全 Theme，默认主题可用）。
+- 复制「场景 + 脚本」即进任何项目。
 
-- 交互信号只调用 `state.transition()`。
-- 组件实现 `_apply_state(new_state)` 决定视觉表现。
-- `state.transition()` 内部防重（同状态重复切换不触发）。
+## 7. 脚本要求
 
-## 5. 零依赖清单（组件脚本禁止）
-
-- `preload` 游戏业务脚本 / 场景
-- 访问 autoload 单例（`UISignalBus` 可选，不强制）
-- 硬编码 `Color` / `Font` / 尺寸魔法数（应参数化）
-- 读取 `user://` 或外部数据文件
-
-## 6. 脚本要求
-
-- 显式类型标注（`var x: Control`），禁止 Variant 推断。
-- `class_name` 在 `extends` 之前。
-- 每个脚本 ≤ 300 行；超出拆子类 / 组合。
+- 显式类型标注；`class_name` 在 `extends` 前。
+- **class_name 不能与 Godot 原生类同名**（`BaseButton`/`PopupPanel` 都是引擎已有类——先查文档再命名）。
+- 每个脚本 ≤ 150 行；超了说明职责不纯。

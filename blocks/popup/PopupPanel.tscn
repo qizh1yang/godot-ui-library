@@ -1,0 +1,25 @@
+[gd_scene format=4]
+
+[ext_resource type="Script" path="res://blocks/popup/ui_popup.gd" id="1"]
+
+[node name="PopupPanel" type="PanelContainer"]
+custom_minimum_size = Vector2(320, 200)
+script = ExtResource("1")
+
+[node name="ModalDim" type="ColorRect" parent="."]
+visible = false
+mouse_filter = 2
+color = Color(0, 0, 0, 0.5)
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="Content" type="MarginContainer" parent="."]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/margin_left = 16
+theme_override_constants/margin_top = 16
+theme_override_constants/margin_right = 16
+theme_override_constants/margin_bottom = 16

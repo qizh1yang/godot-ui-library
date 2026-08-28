@@ -1,0 +1,6 @@
+[gd_scene format=4]
+
+[node name="ToggleButton" type="Button"]
+custom_minimum_size = Vector2(140, 44)
+toggle_mode = true
+text = "Toggle"

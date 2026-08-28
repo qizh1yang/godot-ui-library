@@ -1,26 +1,37 @@
 # Godot Game UI Library
 
-Godot 4.x 游戏 UI **交互与组件库**。收集常见游戏 UI 交互模式，拆分为可复用组件，提供 Demo 与 Catalog 索引，目标是长期积累（50 → 100 → 数百个组件）并可供 AI 检索调用。
+Godot 4.x **UI 积木库**：收录常见游戏 UI 交互模式，每个积木 = 原生节点 + Theme +（必要时）最小脚本。拖进项目即可用，可自由组合，可喂给 AI 检索调用。
 
-> **Reference → Interaction → Animation → Component → Gameplay UI → Demo → Catalog → Reuse**
+> **能用 Godot 原生解决的，不写代码；能用 Theme 解决的，不用脚本；只有行为无法通过原生节点和 Theme 表达时，才增加最小脚本。**
 
 ## 快速开始
 
-1. 用 Godot 4.7.x 打开本项目（`project.godot`）。
-2. 按 **F5** 运行 → 进入 `UIShowcase`（UI 实验室），左侧分类切换，右侧加载对应 Demo。
-3. 单个 Demo 可独立运行：在 `demo/` 下打开场景按 **F6**。
-4. 测试：`godot --headless --path . --script res://tests/run_tests.gd`
+1. 用 Godot 4.7.x 打开本项目 → **F5** 运行 `UIShowcase`（UI 积木实验室，左侧分类切换 Demo）。
+2. 单个 Demo：`demos/` 下打开场景按 **F6**。
+3. 用积木：把 `blocks/<族>/<Block>.tscn` 拖进你的项目 → Inspector 配参数 → 内容塞进 Content 容器。
+4. 视觉：在你的项目 Theme 里配对应类型/变体样式（积木脚本零样式）。
+5. 测试：`godot --headless --path . --script res://tests/run_tests.gd`
 
-## 组件索引（第一阶段）
+## 核心概念：Pure Block vs Behavior Block
 
-| 组件 | 场景 | 交互 | 效果 | Demo |
-|---|---|---|---|---|
-| UIButton | `src/components/button/ui_button/UIButton.tscn` | hover / press | — | ButtonDemo |
-| ScaleButton | `src/components/button/scale_button/ScaleButton.tscn` | hover / press / release | scale + bounce | ButtonDemo |
-| ToggleButton | `src/components/button/toggle_button/ToggleButton.tscn` | select / deselect | scale | ButtonDemo |
-| BasePanel | `src/components/panel/base_panel/BasePanel.tscn` | open / close | — | PanelDemo |
-| UIPopup | `src/components/panel/ui_popup/UIPopup.tscn` | open / close | fade / scale | PanelDemo |
-| BaseCard | `src/components/card/base_card/BaseCard.tscn` | hover / press / select | scale | CardDemo |
+| 类型 | 定义 | 例子 |
+|---|---|---|
+| **Pure Block** | 无脚本（原生节点 + Theme） | Button、ToggleButton、Panel |
+| **Behavior Block** | 原生节点 + 一个最小脚本（只做 Theme 做不了的行为） | ScaleButton（缩放）、DrawerPanel（滑动）、PopupPanel（开合）、Card（状态切换） |
+
+**边界**：Theme 管"长什么样"，脚本管"怎么动"。脚本里永远不出现颜色/字体/样式值。
+
+## Block 索引
+
+| Block | 类型 | 场景 | 行为 |
+|---|---|---|---|
+| Button | Pure | `blocks/button/Button.tscn` | 原生按钮（hover/pressed/disabled 样式走 Theme） |
+| ScaleButton | Behavior | `blocks/button/ScaleButton.tscn` | Hover 放大 / Press 缩小 / Release 弹回 |
+| ToggleButton | Pure | `blocks/button/ToggleButton.tscn` | 原生 toggle_mode（选中样式 = Theme pressed） |
+| Panel | Pure | `blocks/panel/Panel.tscn` | 原生 PanelContainer 容器 |
+| PopupPanel | Behavior | `blocks/popup/PopupPanel.tscn` | 开合动画（Fade / Scale）+ 模态遮罩 |
+| Card | Behavior | `blocks/card/Card.tscn` | hover/选中/禁用状态（Theme 变体切换） |
+| DrawerPanel | Behavior | `blocks/drawer/DrawerPanel.tscn` | 边缘滑入滑出（锚点 + offset Tween） |
 
 完整索引见 [`catalog/index.yaml`](catalog/index.yaml)。
 
@@ -28,30 +39,39 @@ Godot 4.x 游戏 UI **交互与组件库**。收集常见游戏 UI 交互模式�
 
 ```text
 GodotGameUILibrary/
-├── AGENTS.md            # AI 协作规则入口（详细规则在 .ai/）
-├── .ai/                 # 架构/组件/交互/动画/命名/Demo/贡献 规则
-├── catalog/             # AI 检索索引（index.yaml + 分类说明）
-├── src/
-│   ├── core/            # UIState 状态机 / UIComponent 基类 / UISignalBus
-│   ├── interaction/     # 交互层（行为定义）
-│   ├── animation/       # 动画层（ScaleFeedback / FadeFeedback / BounceFeedback）
-│   └── components/      # 可复用组件（场景 + 脚本 + README）
-├── gameplay/            # 游戏业务 UI（规划中，组合基础组件）
-├── demo/                # 每个组件的可运行 Demo + UIShowcase
-├── reference/           # 游戏 UI 参考收录（截图/视频/分析）
-├── assets/              # 美术资源（当前零素材，样式由代码生成）
+├── AGENTS.md            # AI 协作规则入口
+├── .ai/                 # 规则文档（architecture / component / interaction / animation / naming / demo / contribution）
+├── blocks/              # UI 积木（Scene + 可选最小脚本）
+│   ├── button/  panel/  card/  popup/  drawer/ ...
+├── demos/               # 每个 Block 的 Demo + UIShowcase（主场景）
+├── catalog/             # AI 检索索引（index.yaml）
+├── assets/              # 共享美术资源（零素材时全走 Theme）
+├── reference/           # 游戏 UI 参考收录
 └── tests/               # headless 自动化测试
 ```
 
-## 核心设计原则
+## 用积木组合（示例：右侧滑出的背包）
 
-- **组件零依赖自包含**：不依赖 autoload、不依赖项目资源，复制场景 + 脚本即可进任何项目。
-- **交互与动画解耦**：交互（鼠标/触摸 → 状态）→ 状态机（UIState）→ 动画（Feedback 类消费状态）。`hover → scale` 可换成 `hover → glow`。
-- **业务隔离**：组件只发信号（`toggled` / `clicked` / `opened`），不直接操作业务系统。
-- **Composition over inheritance**：Godot 单节点脚本限制下，Button 族继承原生 Button，其余组件统一继承 `UIComponent`（背景自绘 + 状态机 + 生命周期），状态机以组合方式复用（见 `.ai/architecture.md`）。
+```text
+DrawerPanel（direction = RIGHT）
+└── Content
+    ├── Panel（标题栏）
+    ├── GridContainer（物品格）
+    │   ├── Card × N（每个格一张卡，selectable）
+    │   └── ...
+    └── Button（关闭）
+```
 
-## AI 检索方式
+```gdscript
+var drawer := preload("res://blocks/drawer/DrawerPanel.tscn").instantiate()
+drawer.direction = DrawerPanel.Direction.RIGHT
+drawer.duration = 0.3
+add_child(drawer)
+open_btn.pressed.connect(drawer.open)
+```
 
-AI 接到 UI 需求时应：
+## AI 工作方式
 
-1. 读取 `AGENTS.md` → 2. 读取 `catalog/index.yaml` → 3. 按 名称/分类/interaction/effect/tags 搜索 → 4. 读取组件 README → 5. 检查场景 → 6. 复用组件，**禁止未搜索就重新实现**。
+AI 接到 UI 需求时：
+
+1. 读取 `AGENTS.md` → 2. 查看 `catalog/index.yaml` → 3. 按 类型/分类/交互/tags 搜索 → 4. 打开 Scene 看 Inspector 参数 → 5. 拖入组合 → 6. 禁止未搜索就重新实现。

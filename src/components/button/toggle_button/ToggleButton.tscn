@@ -1,9 +1,0 @@
-[gd_scene format=4]
-
-[ext_resource type="Script" path="res://src/components/button/toggle_button/toggle_button.gd" id="1"]
-
-[node name="ToggleButton" type="Button"]
-custom_minimum_size = Vector2(120, 44)
-toggle_mode = true
-text = "Toggle"
-script = ExtResource("1")

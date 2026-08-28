@@ -1,7 +1,0 @@
-[gd_scene format=4]
-
-[ext_resource type="Script" path="res://src/components/card/base_card/base_card.gd" id="1"]
-
-[node name="BaseCard" type="Control"]
-custom_minimum_size = Vector2(140, 180)
-script = ExtResource("1")

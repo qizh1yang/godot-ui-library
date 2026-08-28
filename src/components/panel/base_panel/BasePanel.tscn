@@ -1,7 +1,0 @@
-[gd_scene format=4]
-
-[ext_resource type="Script" path="res://src/components/panel/base_panel/base_panel.gd" id="1"]
-
-[node name="BasePanel" type="Control"]
-custom_minimum_size = Vector2(320, 200)
-script = ExtResource("1")
