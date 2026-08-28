@@ -1,0 +1,25 @@
+; Engine configuration file.
+; Godot Game UI Library — 4.x / GDScript / GL Compatibility
+
+config_version=5
+
+[application]
+
+config/name="Godot Game UI Library"
+config/description="Game UI interaction & component library for Godot 4.x. Collect, replicate, package, demo, reuse."
+run/main_scene="res://demo/showcase/UIShowcase.tscn"
+config/features=PackedStringArray("4.7", "GL Compatibility")
+
+[autoload]
+
+UISignalBus="*res://src/core/ui_signal_bus.gd"
+
+[display]
+
+window/size/viewport_width=1280
+window/size/viewport_height=720
+
+[rendering]
+
+renderer/rendering_method="gl_compatibility"
+renderer/rendering_method.mobile="gl_compatibility"

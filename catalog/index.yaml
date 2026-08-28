@@ -1,0 +1,119 @@
+# Catalog — Godot Game UI Library 索引
+# AI 检索入口：按 名称/分类/交互/效果/tags 搜索后，读组件 README + Scene。
+# 新增组件必须在此登记（见 .ai/contribution_rules.md）。
+
+version: 0.1
+engine: godot 4.7
+lang: gdscript
+
+components:
+
+  - id: ui_button
+    name: Base Button
+    category: button
+    scene: res://src/components/button/ui_button/UIButton.tscn
+    demo: res://demo/button/ButtonDemo.tscn
+    interactions: [hover, press, release]
+    effects: []
+    parameters:
+      text: ""
+      disabled: false
+    tags: [button, base, interaction, game-ui]
+
+  - id: scale_button
+    name: Scale Button
+    category: button
+    scene: res://src/components/button/scale_button/ScaleButton.tscn
+    demo: res://demo/button/ButtonDemo.tscn
+    interactions: [hover, press, release]
+    effects: [scale, bounce]
+    parameters:
+      hover_scale: "Vector2(1.05, 1.05)"
+      press_scale: "Vector2(0.92, 0.92)"
+      animation_duration: 0.12
+      transition: TRANS_BACK
+      ease: EASE_OUT
+    tags: [button, feedback, scale, bounce, game-ui]
+
+  - id: toggle_button
+    name: Toggle Button
+    category: button
+    scene: res://src/components/button/toggle_button/ToggleButton.tscn
+    demo: res://demo/button/ButtonDemo.tscn
+    interactions: [select, deselect]
+    effects: [scale]
+    parameters:
+      selected_scale: "Vector2(1.08, 1.08)"
+      animation_duration: 0.12
+      allow_unselect: true
+    tags: [button, toggle, select, game-ui]
+
+  - id: base_panel
+    name: Base Panel
+    category: panel
+    scene: res://src/components/panel/base_panel/BasePanel.tscn
+    demo: res://demo/panel/PanelDemo.tscn
+    interactions: [open, close]
+    effects: []
+    parameters:
+      modal: false
+      close_on_click_outside: true
+    tags: [panel, container, open-close, game-ui]
+
+  - id: ui_popup
+    name: Popup Panel
+    category: panel
+    scene: res://src/components/panel/ui_popup/UIPopup.tscn
+    demo: res://demo/panel/PanelDemo.tscn
+    interactions: [open, close]
+    effects: [fade, scale]
+    parameters:
+      animation_mode: "FADE | SCALE | NONE"
+      animation_duration: 0.2
+      modal: false
+      scale_from: "Vector2(0.85, 0.85)"
+    tags: [panel, popup, modal, fade, scale, game-ui]
+
+  - id: base_card
+    name: Base Card
+    category: card
+    scene: res://src/components/card/base_card/BaseCard.tscn
+    demo: res://demo/card/CardDemo.tscn
+    interactions: [hover, press, select, deselect]
+    effects: [scale]
+    parameters:
+      selectable: true
+      hover_scale: "Vector2(1.02, 1.02)"
+      selected_scale: "Vector2(1.05, 1.05)"
+      animation_duration: 0.12
+    tags: [card, select, hover, game-ui]
+
+interactions:
+  - id: hover
+    name: Hover
+    description: 鼠标进入/离开组件（触摸无 hover）
+    states: [NORMAL, HOVER]
+  - id: press
+    name: Press
+    description: 按下（button_down / gui_input）
+    states: [PRESSED]
+  - id: select
+    name: Select
+    description: 选中/取消（toggle / set_selected）
+    states: [SELECTED]
+
+effects:
+  - id: scale
+    name: Scale
+    class: src/animation/scale/scale_feedback.gd
+    params: [target, duration, transition, ease]
+  - id: fade
+    name: Fade
+    class: src/animation/fade/fade_feedback.gd
+    params: [target_alpha, duration, hide_on_end]
+  - id: bounce
+    name: Bounce
+    class: src/animation/bounce/bounce_feedback.gd
+    params: [strength, duration]
+
+gameplay: []

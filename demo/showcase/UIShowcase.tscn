@@ -1,0 +1,78 @@
+[gd_scene format=4]
+
+[ext_resource type="Script" path="res://demo/showcase/ui_showcase.gd" id="1"]
+[ext_resource type="PackedScene" path="res://src/components/button/toggle_button/ToggleButton.tscn" id="2"]
+
+[node name="UIShowcase" type="Control"]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1")
+
+[node name="Background" type="ColorRect" parent="."]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0.09, 0.09, 0.12, 1)
+
+[node name="Root" type="HBoxContainer" parent="."]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 16.0
+offset_top = 16.0
+offset_right = -16.0
+offset_bottom = -16.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/separation = 16
+
+[node name="Sidebar" type="PanelContainer" parent="Root"]
+custom_minimum_size = Vector2(220, 0)
+
+[node name="Margin" type="MarginContainer" parent="Root/Sidebar"]
+theme_override_constants/margin_left = 16
+theme_override_constants/margin_top = 20
+theme_override_constants/margin_right = 16
+theme_override_constants/margin_bottom = 16
+
+[node name="VBox" type="VBoxContainer" parent="Root/Sidebar/Margin"]
+theme_override_constants/separation = 10
+
+[node name="SideTitle" type="Label" parent="Root/Sidebar/Margin/VBox"]
+text = "Godot UI Library"
+theme_override_font_sizes/font_size = 18
+
+[node name="SubTitle" type="Label" parent="Root/Sidebar/Margin/VBox"]
+text = "第一阶段 · 组件 Demo"
+theme_override_colors/font_color = Color(0.6, 0.6, 0.68, 1)
+
+[node name="Sep" type="HSeparator" parent="Root/Sidebar/Margin/VBox"]
+
+[node name="BtnButton" parent="Root/Sidebar/Margin/VBox" instance=ExtResource("2")]
+text = "Button"
+
+[node name="BtnPanel" parent="Root/Sidebar/Margin/VBox" instance=ExtResource("2")]
+text = "Panel"
+
+[node name="BtnCard" parent="Root/Sidebar/Margin/VBox" instance=ExtResource("2")]
+text = "Card"
+
+[node name="Footer" type="Label" parent="Root/Sidebar/Margin/VBox"]
+text = "catalog/index.yaml"
+theme_override_colors/font_color = Color(0.45, 0.45, 0.52, 1)
+
+[node name="ContentArea" type="Control" parent="Root"]
+size_flags_horizontal = 3
+size_flags_vertical = 3
+
+[node name="DemoContainer" type="Control" parent="Root/ContentArea"]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2

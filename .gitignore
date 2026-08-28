@@ -1,0 +1,13 @@
+# Godot
+.godot/
+*.translation
+*.uid
+
+# Temp / editor artifacts
+*.tmp
+.hermes-tmp*
+*~
+
+# OS
+Thumbs.db
+.DS_Store
