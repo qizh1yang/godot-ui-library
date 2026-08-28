@@ -32,6 +32,7 @@ Godot 4.x **UI 积木库**：收录常见游戏 UI 交互模式，每个积木 =
 | PopupPanel | Behavior | `blocks/popup/PopupPanel.tscn` | 开合动画（Fade / Scale）+ 模态遮罩 |
 | Card | Behavior | `blocks/card/Card.tscn` | hover/选中/禁用状态（Theme 变体切换） |
 | DrawerPanel | Behavior | `blocks/drawer/DrawerPanel.tscn` | 边缘滑入滑出（锚点 + offset Tween） |
+| SlideOutPanel | Behavior | `blocks/drawer/SlideOutPanel.tscn` | 可折叠侧边面板：ToggleButton 随整体移动，收起保留手柄可见（建筑菜单 Demo：`demos/SlideOutBuildingDemo.tscn`） |
 
 完整索引见 [`catalog/index.yaml`](catalog/index.yaml)。
 

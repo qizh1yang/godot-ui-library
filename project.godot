@@ -1,5 +1,10 @@
 ; Engine configuration file.
-; Godot Game UI Library — UI Blocks（积木库）: Godot Native Node + minimal script + Theme.
+; It's best edited using the editor UI and not directly,
+; since the parameters that go here are not all obvious.
+;
+; Format:
+;   [section] ; section goes between []
+;   param=value ; assign values to parameters
 
 config_version=5
 

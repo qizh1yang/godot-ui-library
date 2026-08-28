@@ -1,8 +1,12 @@
-[gd_scene format=4]
+[gd_scene format=3 uid="uid://bluhrlxwpq0qb"]
 
-[ext_resource type="Script" path="res://blocks/button/scale_button.gd" id="1"]
+[ext_resource type="Script" uid="uid://d3pba0jw8dino" path="res://blocks/button/scale_button.gd" id="1"]
 
-[node name="ScaleButton" type="Button"]
+[node name="ScaleButton" type="Button" unique_id=1817077793]
 custom_minimum_size = Vector2(140, 44)
+offset_left = 570.0
+offset_top = 337.0
+offset_right = 710.0
+offset_bottom = 381.0
 text = "ScaleButton"
 script = ExtResource("1")

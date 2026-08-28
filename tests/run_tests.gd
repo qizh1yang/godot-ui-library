@@ -15,6 +15,7 @@ const SCENES: Dictionary = {
 	"popup_panel": "res://blocks/popup/PopupPanel.tscn",
 	"card": "res://blocks/card/Card.tscn",
 	"drawer_panel": "res://blocks/drawer/DrawerPanel.tscn",
+	"slide_out_panel": "res://blocks/drawer/SlideOutPanel.tscn",
 }
 
 func _initialize() -> void:
@@ -27,6 +28,7 @@ func _run_all() -> void:
 	await _test_popup_panel()
 	await _test_card()
 	await _test_drawer()
+	await _test_slide_out_panel()
 	print("========================================")
 	print("RESULT: %d passed, %d failed" % [_passed, _failed])
 	quit(0 if _failed == 0 else 1)
@@ -116,6 +118,43 @@ func _test_popup_panel() -> void:
 	popup.animation_mode = UIPopup.AnimationMode.SCALE
 	check(popup.animation_mode == UIPopup.AnimationMode.SCALE, "animation_mode SCALE settable")
 	popup.queue_free()
+
+func _test_slide_out_panel() -> void:
+	print("-- SlideOutPanel --")
+	var panel: SlideOutPanel = instantiate(SCENES["slide_out_panel"]) as SlideOutPanel
+	check(not panel.is_open, "initial closed")
+	check(is_equal_approx(panel.offset_left, panel._collapsed_offset), "collapsed offset initial")
+	var btn: Button = panel.get_node("ToggleButton") as Button
+	check(btn != null, "ToggleButton is child of root (moves as one body)")
+	var opened_events: Array[int] = []
+	var closed_events: Array[int] = []
+	panel.opened.connect(func() -> void: opened_events.append(1))
+	panel.closed.connect(func() -> void: closed_events.append(1))
+	panel.duration = 0.05 # 缩短动画便于测试等待
+	panel.open()
+	check(panel.is_open, "open -> is_open")
+	await panel.opened # opened 在动画完成后发出
+	check(opened_events.size() == 1, "opened signal after animation")
+	check(is_equal_approx(panel.offset_left, panel._expanded_offset), "expanded offset reached")
+	check(panel.get_global_rect().encloses(btn.get_global_rect()), "toggle button stays inside panel body")
+	# 连续触发不瞬移：open 途中 close（kill 旧 tween 从当前位置继续）
+	panel.open() # 已展开 → 无操作
+	check(opened_events.size() == 1, "re-open blocked")
+	panel.close()
+	check(not panel.is_open, "close -> not is_open")
+	await panel.closed
+	check(closed_events.size() == 1, "closed signal after animation")
+	check(is_equal_approx(panel.offset_left, panel._collapsed_offset), "collapsed offset reached")
+	# start_open 初始展开（必须在 add_child 触发 _ready 之前设置）
+	var scene: PackedScene = load(SCENES["slide_out_panel"]) as PackedScene
+	var opened_panel: SlideOutPanel = scene.instantiate() as SlideOutPanel
+	opened_panel.start_open = true
+	root.add_child(opened_panel)
+	await process_frame
+	check(opened_panel.is_open, "start_open -> is_open")
+	check(is_equal_approx(opened_panel.offset_left, opened_panel._expanded_offset), "start_open expanded position")
+	opened_panel.queue_free()
+	panel.queue_free()
 
 func _test_card() -> void:
 	print("-- Card --")

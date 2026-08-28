@@ -35,6 +35,10 @@ static func build() -> Theme:
 	theme.set_stylebox("panel", "CardSelected", _style(CARD_BG.lightened(0.22), 12, ACCENT, 2))
 	theme.set_stylebox("panel", "CardDisabled", _style(CARD_BG.darkened(0.25), 12))
 
+	# --- Demo 建筑槽 ---
+	theme.set_stylebox("panel", "BuildingSlot", _style(CARD_BG, 8))
+	theme.set_stylebox("panel", "BuildingSlotHover", _style(CARD_BG.lightened(0.12), 8, Color(1, 1, 1, 0.25), 2))
+
 	# --- Label ---
 	theme.set_color("font_color", "Label", TEXT)
 

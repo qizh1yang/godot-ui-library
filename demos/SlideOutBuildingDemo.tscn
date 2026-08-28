@@ -1,0 +1,68 @@
+[gd_scene format=4]
+
+[ext_resource type="Script" path="res://demos/slide_out_building_demo.gd" id="1"]
+[ext_resource type="PackedScene" path="res://blocks/drawer/SlideOutPanel.tscn" id="2"]
+[ext_resource type="Script" path="res://demos/demo_map.gd" id="3"]
+
+[node name="SlideOutBuildingDemo" type="Control"]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1")
+
+[node name="Background" type="ColorRect" parent="."]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0.09, 0.09, 0.12, 1)
+
+[node name="Map" type="Control" parent="."]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("3")
+
+[node name="MapBG" type="ColorRect" parent="Map"]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0.13, 0.17, 0.15, 1)
+
+[node name="MapHint" type="Label" parent="Map"]
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -200.0
+offset_top = -40.0
+offset_right = 200.0
+offset_bottom = 40.0
+grow_horizontal = 2
+grow_vertical = 2
+text = "把建筑拖到这里"
+horizontal_alignment = 1
+theme_override_colors/font_color = Color(0.5, 0.55, 0.52, 1)
+theme_override_font_sizes/font_size = 28
+
+[node name="SlideOutPanel" parent="." instance=ExtResource("2")]
+direction = 1
+
+[node name="Hint" type="Label" parent="."]
+anchors_preset = 10
+anchor_right = 1.0
+offset_top = 12.0
+offset_bottom = 44.0
+grow_horizontal = 2
+text = "点击 ◀ 展开面板，把建筑拖到地图"
+horizontal_alignment = 1
+theme_override_colors/font_color = Color(0.85, 0.85, 0.9, 1)
+theme_override_font_sizes/font_size = 18

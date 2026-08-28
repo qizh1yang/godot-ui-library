@@ -111,6 +111,26 @@ blocks:
       close_on_click_outside: true
     tags: [drawer, sidebar, slide, modal, behavior, game-ui]
 
+  - id: slide_out_panel
+    name: Slide Out Panel
+    block_type: behavior
+    category: panel
+    scene: res://blocks/drawer/SlideOutPanel.tscn
+    demo: res://demos/SlideOutBuildingDemo.tscn
+    script: res://blocks/drawer/slide_out_panel.gd
+    interactions: [open, close]
+    effects: [slide]
+    parameters:
+      direction: "LEFT | RIGHT | TOP | BOTTOM"
+      duration: 0.25
+      transition: TRANS_CUBIC
+      ease: EASE_OUT
+      collapsed_visible_size: 48.0
+      start_open: false
+    purpose: 从屏幕边缘滑入/滑出的可折叠面板；ToggleButton 与 Panel 同一整体移动，收起时保留 collapsed_visible_size 区域（手柄）可见
+    notes: 锚点贴边方案天然抗 Resize；Content 完全可替换（建筑菜单/背包/列表/商店）
+    tags: [drawer, slide, collapsible, toggle, behavior, game-ui]
+
 interactions:
   - id: hover
     name: Hover
